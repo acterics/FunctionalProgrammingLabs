@@ -2,7 +2,6 @@ module Main where
 
 import Person
 import ParseEnv
-import Database.HDBC
 import Database.HDBC.PostgreSQL (connectPostgreSQL, Connection)
 
 
