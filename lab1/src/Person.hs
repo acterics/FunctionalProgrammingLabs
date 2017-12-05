@@ -15,6 +15,9 @@ type Position = String
 
 data Person = Person { id :: Id, firstName :: FirstName, lastName :: LastName, position :: Position } deriving (Show)
 
+
+
+
 unpack_person :: [SqlValue] -> Person
 unpack_person [SqlInteger id, SqlByteString first_name, SqlByteString last_name, SqlByteString position] =
   Person id (BS.unpack first_name) (BS.unpack last_name) (BS.unpack position)

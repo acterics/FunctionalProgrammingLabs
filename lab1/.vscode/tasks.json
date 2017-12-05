@@ -21,6 +21,13 @@
             "type": "shell",
             "command": "docker-compose up --build",
             "problemMatcher": []
+        },
+
+        {
+            "label": "rebuild && run",
+            "type": "shell",
+            "command": "stack build && stack exec lab1-exe",
+            "problemMatcher": []
         }
     ]
 }
