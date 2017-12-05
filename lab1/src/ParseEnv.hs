@@ -1,5 +1,3 @@
-
-
 module ParseEnv where 
 
 import Data.List.Split
