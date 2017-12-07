@@ -18,8 +18,8 @@ data Person = Person { id :: Id, firstName :: FirstName, lastName :: LastName, p
 
 
 unpack_person :: [SqlValue] -> Person
-unpack_person [SqlInteger person_id, SqlByteString first_name, SqlByteString last_name, SqlByteString position] =
-  Person person_id (BS.unpack first_name) (BS.unpack last_name) (BS.unpack position)
+unpack_person [SqlInteger person_id, SqlByteString first_name, SqlByteString last_name, SqlByteString pos] =
+  Person person_id (BS.unpack first_name) (BS.unpack last_name) (BS.unpack pos)
 unpack_person x = error $ "Unexpected result: " ++ show x
 
 unpack_person_list :: [[SqlValue]] -> IO [Person]

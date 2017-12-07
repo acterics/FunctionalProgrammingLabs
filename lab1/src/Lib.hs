@@ -1,7 +1,15 @@
 module Lib where 
 
 import Data.Time
-import Data.Time.LocalTime
+
+exit_success_code :: Integer
+exit_success_code = 0
+
+exit_fail_code :: Integer
+exit_fail_code = 1
+
+continue_code :: Integer
+continue_code = 2
 
 
 is_success_db_operation :: Integer -> IO Bool

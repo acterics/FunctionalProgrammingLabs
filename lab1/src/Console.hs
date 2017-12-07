@@ -1,43 +1,51 @@
 module Console where
 
-
-import Person
-import Section
+import Lib
 import Prelude
+import Database.HDBC.PostgreSQL (Connection)
+import Data.List.Split
+import ShowCommand
+import UpdateCommand
 
-column_length :: Int
-column_length = 15
+start_cli :: Connection -> IO ()
+start_cli connection = do
+    putStrLn "Welcome to Lab1 Application"
+    process_commands connection continue_code
+    putStrLn "#######################################################"
 
-show_person :: Person -> IO ()
-show_person person = putStrLn $ foldl (++) "" $ fields person where
-    fields person = map get_field_with_spaces [show $ Person.id person , firstName person, lastName person, position person] 
 
-show_section :: Section -> IO ()
-show_section section = putStrLn $ foldl (++) "" $ fields section where
-    fields section = map get_field_with_spaces [show $ Section.id section, Section.title section]
+process_command :: Connection -> String -> IO Integer
+process_command _ "exit" = return exit_success_code
 
-show_persons_list :: [Person] -> IO ()
-show_persons_list persons = do
-    putStrLn get_person_table_headers
-    mapM_ show_person persons
+process_command _ "help" = do
+    putStrLn "help - Show commands description"
+    putStrLn "show - Show table content"
+    putStrLn "exit - Exit from application"
+    return continue_code
 
-show_sections_list :: [Section] -> IO ()
-show_sections_list sections = do
-    putStrLn get_section_table_headers
-    mapM_ show_section sections
+process_command connection command = process_command_with_args connection $ parse_command command
 
-get_spaces :: String -> String
-get_spaces input = foldl add "" [0..get_spaces_count input] where
-    add spaces _ = spaces ++ " "
-    get_spaces_count = (-) column_length . length
+process_command_with_args :: Connection -> [String] -> IO Integer
+process_command_with_args connection (command:arguments) = 
+    case command of
+        "show" -> ShowCommand.process connection arguments 
+        "update" -> UpdateCommand.process arguments
+        _ -> return exit_fail_code
+   
+parse_command :: String -> [String]
+parse_command = splitOn " "
 
-get_field_with_spaces :: String -> String
-get_field_with_spaces input = input ++ get_spaces input
 
-get_person_table_headers :: String
-get_person_table_headers = foldl (++) "" fields where
-    fields = map get_field_with_spaces ["ID", "FIRST_NAME", "LAST_NAME", "POSITION"]
+process_commands :: Connection -> Integer -> IO Integer
+    
+process_commands connection 2 = do
+    getLine >>= process_command connection  >>= process_commands connection
 
-get_section_table_headers :: String
-get_section_table_headers = foldl (++) "" fields where
-    fields = map get_field_with_spaces ["ID", "TITLE"]
+process_commands _ 0 = do
+    putStrLn "Exit without errors"
+    return 0
+
+process_commands _ 1 = do
+    putStrLn "Exit with error"
+    return 1
+

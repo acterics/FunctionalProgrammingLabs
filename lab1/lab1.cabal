@@ -25,6 +25,8 @@ library
                      , Schedule
                      , ParseEnv
                      , Console
+                     , ShowCommand
+                     , UpdateCommand
                 
   build-depends:       base >= 4.7 && < 5
                      , HDBC
