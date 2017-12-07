@@ -23,7 +23,7 @@
 - `last_name`
 - `position`    (**Student**, **Teacher**)
 
-### SectionParticipation
+### SectionParticipant
 
 - `section_id`
 - `person_id`

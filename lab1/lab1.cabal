@@ -21,6 +21,7 @@ library
   hs-source-dirs:      src
   exposed-modules:     Lib
                      , Person
+                     , Section
                      , ParseEnv
                      , Console
                 
