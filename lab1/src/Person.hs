@@ -22,24 +22,28 @@ unpack_person [SqlInteger person_id, SqlByteString first_name, SqlByteString las
   Person person_id (BS.unpack first_name) (BS.unpack last_name) (BS.unpack position)
 unpack_person x = error $ "Unexpected result: " ++ show x
 
+unpack_person_list :: [[SqlValue]] -> [Person]
+unpack_person_list = return . map unpack_person
+
+unpack_person_from_list :: [[SqlValue]] -> Person
+unpack_person_from_list = return . head . map unpack_person
+
 read_all_persons :: Connection -> IO [Person]
 read_all_persons conn = quickQuery conn query [] >>= handle_result where
   query = "SELECT * FROM person ORDER BY id"
   handle_result = return . map unpack_person
 
 read_person :: Id -> Connection -> IO Person
-read_person person_id conn = quickQuery conn query params >>= handle_result where
+read_person person_id conn = quickQuery conn query params >>= unpack_person_from_list where
   query = "SELECT * FROM person WHERE id = ?"
   params = [SqlInteger person_id]
-  handle_result = return . head . map unpack_person
 
 
 read_section_persons :: Id -> Connection -> IO [Person]
-read_section_persons section_id connection = quickQuery connection query params >>= handle_result where
+read_section_persons section_id connection = quickQuery connection query params >>= unpack_person_list where
   query = "SELECT * FROM person WHERE id IN " ++ 
           "(SELECT person_id FROM section_participant WHERE section_id = ?)"
   params = [SqlInteger section_id]
-  handle_result = return . map unpack_person
 
 
 
