@@ -25,13 +25,13 @@ unpack_person x = error $ "Unexpected result: " ++ show x
 read_all_persons :: Connection -> IO [Person]
 read_all_persons conn = quickQuery conn query [] >>= handle_result where
   query = "SELECT * FROM person ORDER BY id"
-  handle_result result = return $ map unpack_person result
+  handle_result = return . map unpack_person
 
 read_person :: Id -> Connection -> IO Person
 read_person person_id conn = quickQuery conn query params >>= handle_result where
   query = "SELECT * FROM person WHERE id = ?"
   params = [SqlInteger person_id]
-  handle_result result = return $ head $ map unpack_person result
+  handle_result = return . head . map unpack_person
 
 
 read_section_persons :: Id -> Connection -> IO [Person]
@@ -39,7 +39,7 @@ read_section_persons section_id connection = quickQuery connection query params 
   query = "SELECT * FROM person WHERE id IN " ++ 
           "(SELECT person_id FROM section_participant WHERE section_id = ?)"
   params = [SqlInteger section_id]
-  handle_result result = return $ map unpack_person result
+  handle_result = return . map unpack_person
 
 
 
@@ -58,5 +58,5 @@ delete_person person_id connection =
 create_person :: FirstName -> LastName -> Position -> Connection -> IO Bool
 create_person first_name last_name pos connection =
   run connection query params >>= is_success_db_operation where 
-    query = "INSERT INTO person (first_name, last_name, position) values(?, ?, ?)"
+    query = "INSERT INTO person (first_name, last_name, position) VALUES(?, ?, ?)"
     params = map (SqlByteString . BS.pack) [first_name, last_name, pos]

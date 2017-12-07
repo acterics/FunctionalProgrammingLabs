@@ -1,7 +1,6 @@
 module Console where
 
 
-import Database.HDBC.PostgreSQL
 import Person
 import Section
 import Prelude
@@ -18,12 +17,6 @@ show_section :: Section -> IO ()
 show_section section = 
     putStrLn $ (get_field_with_spaces $ show $ Section.id section) ++ (get_field_with_spaces $ Section.title section)
 
--- show_sections :: Connection -> IO ()
--- show_sections connection = 
-
--- show_persons :: Connection -> IO ()
--- show_persons connection = read_all_persons connection >>= show_persons_list
-
 show_persons_list :: [Person] -> IO ()
 show_persons_list persons = do
     putStrLn get_person_table_headers
@@ -33,6 +26,10 @@ show_sections_list :: [Section] -> IO ()
 show_sections_list sections = do
     putStrLn get_section_table_headers
     mapM_ show_section sections
+
+
+
+
 
 get_spaces :: String -> String
 get_spaces input = foldl add "" [0..get_spaces_count input] where

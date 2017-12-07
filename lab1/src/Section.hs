@@ -12,8 +12,6 @@ type Id = Integer
 data Section = Section {id :: Id, title :: SectionTitle} deriving (Show)
 -- data SectionParticipation = SectionParticipation {section_id :: Integer, person_id :: Integer }
 
-
-
 unpack_section :: [SqlValue] -> Section
 unpack_section [SqlInteger section_id, SqlByteString section_title] =
   Section section_id (BS.unpack section_title)
@@ -42,7 +40,7 @@ update_section :: Id -> SectionTitle -> Connection -> IO Bool
 update_section section_id section_title connection = 
   run connection query params >>= is_success_db_operation where 
     query = "UPDATE section SET title = ? WHERE id = ?"
-    params = [SqlInteger section_id, SqlByteString $ BS.pack section_title]
+    params = [SqlByteString $ BS.pack section_title, SqlInteger section_id]
 
 delete_section :: Id -> Connection -> IO Bool
 delete_section section_id connection = 
@@ -54,5 +52,5 @@ delete_section section_id connection =
 create_section :: SectionTitle -> Connection -> IO Bool
 create_section section_title connection = 
   run connection query params >>= is_success_db_operation where 
-    query = "INSERT INTO section (title) values(?)" 
+    query = "INSERT INTO section (title) VALUES(?)" 
     params = [SqlByteString $ BS.pack section_title]
