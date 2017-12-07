@@ -18,17 +18,16 @@ unpack_section [SqlInteger section_id, SqlByteString section_title] =
 unpack_section x = error $ "Unexpected result: " ++ show x
 
 
-unpack_section_list :: [[SqlValue]] -> [Section]
+unpack_section_list :: [[SqlValue]] -> IO [Section]
 unpack_section_list = return . map unpack_section
 
-unpack_section_from_list :: [[SqlValue]] -> Section
+unpack_section_from_list :: [[SqlValue]] -> IO Section
 unpack_section_from_list = return . head . map unpack_section
 
 
 read_all_sections :: Connection -> IO [Section]
 read_all_sections conn = quickQuery conn query [] >>= unpack_section_list where
   query = "SELECT * FROM section ORDER BY id"
-  handle_result  = return . map unpack_section
 
 read_section :: Id -> Connection -> IO Section
 read_section section_id connection = quickQuery connection query params >>= unpack_section_from_list where

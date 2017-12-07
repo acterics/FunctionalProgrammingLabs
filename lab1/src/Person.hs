@@ -22,10 +22,10 @@ unpack_person [SqlInteger person_id, SqlByteString first_name, SqlByteString las
   Person person_id (BS.unpack first_name) (BS.unpack last_name) (BS.unpack position)
 unpack_person x = error $ "Unexpected result: " ++ show x
 
-unpack_person_list :: [[SqlValue]] -> [Person]
+unpack_person_list :: [[SqlValue]] -> IO [Person]
 unpack_person_list = return . map unpack_person
 
-unpack_person_from_list :: [[SqlValue]] -> Person
+unpack_person_from_list :: [[SqlValue]] -> IO Person
 unpack_person_from_list = return . head . map unpack_person
 
 read_all_persons :: Connection -> IO [Person]
