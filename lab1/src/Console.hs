@@ -11,7 +11,8 @@ start_cli :: Connection -> IO ()
 start_cli connection = do
     putStrLn "Welcome to Lab1 Application"
     process_commands connection continue_code
-    putStrLn "#######################################################"
+    putStrLn ""
+    
 
 
 process_command :: Connection -> String -> IO Integer
@@ -39,6 +40,7 @@ parse_command = splitOn " "
 process_commands :: Connection -> Integer -> IO Integer
     
 process_commands connection 2 = do
+    putStrLn ""
     getLine >>= process_command connection  >>= process_commands connection
 
 process_commands _ 0 = do

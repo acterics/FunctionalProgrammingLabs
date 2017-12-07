@@ -13,11 +13,11 @@ type Id = Integer
 type ScheduleDay = Integer
 type RawTime = String
 
-data Schedule = Schedule{ schedule_id :: Id, section_id :: Id, day :: ScheduleDay, time_start :: TimeOfDay, time_end :: TimeOfDay }
+data Schedule = Schedule{ id :: Id, section_id :: Id, day :: ScheduleDay, time_start :: TimeOfDay, time_end :: TimeOfDay }
 
 unpack_schedule :: [SqlValue] -> Schedule
-unpack_schedule [SqlInteger schedule_id, SqlInteger section_id, SqlInteger day, SqlLocalTimeOfDay begin, SqlLocalTimeOfDay end] = 
-    Schedule schedule_id section_id day begin end
+unpack_schedule [SqlInteger schedule_id, SqlInteger sec_id, SqlInteger day_of_week, SqlLocalTimeOfDay begin, SqlLocalTimeOfDay end] = 
+    Schedule schedule_id sec_id day_of_week begin end
 unpack_schedule x = error $ "Unexpected result: " ++ show x
 
 unpack_schedule_list :: [[SqlValue]] -> IO [Schedule]
@@ -29,7 +29,7 @@ read_all_schedule connection = quickQuery connection query [] >>= unpack_schedul
 
 read_day_schedule :: ScheduleDay -> Connection -> IO [Schedule]
 read_day_schedule schedule_day connection = quickQuery connection query params >>= unpack_schedule_list where
-    query = "SELECT * FROM schedule WHERE day = ?"
+    query = "SELECT * FROM schedule WHERE day = ? ORDER BY time_start"
     params = [SqlInteger schedule_day]
 
 read_section_schedule :: Id -> Connection -> IO [Schedule]

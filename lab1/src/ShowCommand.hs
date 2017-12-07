@@ -31,8 +31,8 @@ show_help = do
     return continue_code
 
 show_person :: Person -> IO ()
-show_person person = putStrLn $ foldl (++) "" $ fields person where
-    fields person = map get_field_with_spaces [show $ Person.id person , firstName person, lastName person, position person] 
+show_person person = putStrLn $ foldl (++) "" $ fields where
+    fields = map get_field_with_spaces [show $ Person.id person , firstName person, lastName person, position person] 
 
 
 show_persons_list :: [Person] -> IO ()
@@ -59,8 +59,8 @@ get_section_table_headers = foldl (++) "" fields where
 
 
 show_section :: Section -> IO ()
-show_section section = putStrLn $ foldl (++) "" $ fields section where
-    fields section = map get_field_with_spaces [show $ Section.id section, Section.title section]
+show_section section = putStrLn $ foldl (++) "" $ fields where
+    fields = map get_field_with_spaces [show $ Section.id section, Section.title section]
 
 
 
