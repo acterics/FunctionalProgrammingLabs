@@ -1,6 +1,6 @@
 module Person where
 
-
+import Lib
 import Prelude hiding (read)
 import Database.HDBC
 import Database.HDBC.PostgreSQL
@@ -14,6 +14,7 @@ type LastName = String
 type Position = String
 
 data Person = Person { id :: Id, firstName :: FirstName, lastName :: LastName, position :: Position } deriving (Show)
+
 
 
 unpack_person :: [SqlValue] -> Person
@@ -33,7 +34,7 @@ read_person person_id conn = quickQuery conn query params >>= handle_result wher
   handle_result result = return $ head $ map unpack_person result
 
 
-read_section_persons :: Integer -> Connection -> IO [Person]
+read_section_persons :: Id -> Connection -> IO [Person]
 read_section_persons section_id connection = quickQuery connection query params >>= handle_result where
   query = "SELECT * FROM person WHERE id IN " ++ 
           "(SELECT person_id FROM section_participant WHERE section_id = ?)"
@@ -44,18 +45,18 @@ read_section_persons section_id connection = quickQuery connection query params 
 
 update_person :: Id -> FirstName -> LastName -> Position -> Connection -> IO Bool
 update_person person_id first_name last_name pos connection = 
-  run connection query params >>= (\changed -> return $ changed == 1) where
+  run connection query params >>= is_success_db_operation where
     query = "UPDATE person SET first_name = ?, last_name = ?, position = ? WHERE id = ?"
     params = map (SqlByteString . BS.pack) [first_name, last_name, pos] ++ [SqlInteger person_id]
 
 delete_person :: Id -> Connection -> IO Bool
 delete_person person_id connection = 
-  run connection query params >>= (\changed -> return $ changed == 1) where
+  run connection query params >>= is_success_db_operation where
     query = "DELETE FROM person WHERE id = ?"
     params = [SqlInteger person_id]
 
 create_person :: FirstName -> LastName -> Position -> Connection -> IO Bool
 create_person first_name last_name pos connection =
-  run connection query params >>= (\changed -> return $ changed == 1) where 
+  run connection query params >>= is_success_db_operation where 
     query = "INSERT INTO person (first_name, last_name, position) values(?, ?, ?)"
     params = map (SqlByteString . BS.pack) [first_name, last_name, pos]
