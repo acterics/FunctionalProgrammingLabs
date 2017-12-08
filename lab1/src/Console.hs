@@ -21,6 +21,7 @@ process_command _ "exit" = return exit_success_code
 process_command _ "help" = do
     putStrLn "help - Show commands description"
     putStrLn "show - Show table content"
+    putStrLn "update - Update table content"
     putStrLn "exit - Exit from application"
     return continue_code
 
@@ -30,7 +31,7 @@ process_command_with_args :: Connection -> [String] -> IO Integer
 process_command_with_args connection (command:arguments) = 
     case command of
         "show" -> ShowCommand.process connection arguments 
-        "update" -> UpdateCommand.process arguments
+        "update" -> UpdateCommand.process connection arguments
         _ -> return exit_fail_code
    
 parse_command :: String -> [String]

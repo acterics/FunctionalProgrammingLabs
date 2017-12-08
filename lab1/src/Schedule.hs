@@ -64,7 +64,7 @@ create_schedule :: Id -> ScheduleDay -> RawTime -> RawTime -> Connection -> IO B
 create_schedule section_id schedule_day begin end connection =
     run connection query params >>= is_success_db_operation where
         query = "INSERT INTO schedule (section_id, day_of_week, time_start, time_end) VALUES(?, ?, ?, ?)"
-        params = [SqlInteger section_id, SqlLocalTimeOfDay $ parse_time begin, SqlLocalTimeOfDay $ parse_time end]
+        params = [SqlInteger section_id, SqlInteger schedule_day, SqlLocalTimeOfDay $ parse_time begin, SqlLocalTimeOfDay $ parse_time end]
 
 
 
