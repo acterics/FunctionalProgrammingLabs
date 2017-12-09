@@ -1,3 +1,4 @@
+-- Module implements CRUD functions for section table
 module Section where
 
 import Lib

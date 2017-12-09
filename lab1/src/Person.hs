@@ -1,3 +1,4 @@
+-- Module implements CRUD functions for person table
 module Person where
 
 import Lib
@@ -12,6 +13,7 @@ type FirstName = String
 type LastName = String
 -- data Position = Student | Teacher deriving (Enum, Show)
 type Position = String
+
 
 data Person = Person { id :: Id, firstName :: FirstName, lastName :: LastName, position :: Position } deriving (Show)
 
