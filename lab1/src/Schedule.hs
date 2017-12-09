@@ -52,9 +52,10 @@ read_section_schedule' section_id connection = quickQuery connection query param
 
 read_section_schedule :: String -> Connection -> IO [Schedule]
 read_section_schedule section_name connection = quickQuery connection query params >>= unpack_schedule_list where
-    query = foldl (++) "" ["SELECT section_schedule.id, title, day_of_week, time_start, time_end ",
-            "FROM section_schedule INNER JOIN section ON section_id = section.id ",
-            "WHERE title = ? ORDER BY day_of_week, time_start, title "
+    query = foldl (++) "" [
+        "SELECT section_schedule.id, title, day_of_week, time_start, time_end ",
+        "FROM section_schedule INNER JOIN section ON section_id = section.id ",
+        "WHERE title = ? ORDER BY day_of_week, time_start, title "
         ]
     params = [SqlByteString $ BS.pack section_name]
 

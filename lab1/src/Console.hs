@@ -42,7 +42,7 @@ process_command_with_args connection (command:arguments) = process_command_with_
 process_command_with_args' :: String -> Connection -> [String] -> IO Integer
 process_command_with_args' "show" = ShowCommand.process
 process_command_with_args' "update" = UpdateCommand.process
-process_command_with_args' _   = \ _ _ -> return exit_fail_code
+process_command_with_args' command = \ _ _ -> show_error "" [command]
 
    
 parse_command :: String -> [String]
