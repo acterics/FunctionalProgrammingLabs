@@ -1,4 +1,4 @@
-module ShowCommand where
+module ShowCommand(process) where
 
 import Lib
 import Database.HDBC.PostgreSQL (Connection)
@@ -7,20 +7,11 @@ import Section
 
 process :: Connection -> [String] -> IO Integer
 
-process _ [] = do
-    putStrLn "Illegal no arguments for this command"
-    return exit_fail_code
-
-process connection (command:_) = 
-    case command of
-        "persons" -> read_all_persons connection >>= show_persons_list >> return continue_code
-        "sections" -> read_all_sections connection >>= show_sections_list >> return continue_code
-        "help" -> show_help
-        _ -> return exit_fail_code
-
--- process arguments = do
---     putStrLn $ show arguments
---     return continue_code
+process connection ("persons":_) = read_all_persons connection >>= show_persons_list >> return continue_code
+process connection ("sections":_) = read_all_sections connection >>= show_sections_list >> return continue_code
+process _ ("help":_) = show_help
+process _ [] = putStrLn "Illegal no arguments for this command" >> return exit_fail_code
+process _ (_:_) = return exit_fail_code
 
 column_length :: Int
 column_length = 15
