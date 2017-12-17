@@ -37,7 +37,7 @@ read_day_schedule schedule_day connection = quickQuery connection query params >
     query = foldl (++) "" [
         "SELECT section_schedule.id, title, day_of_week, time_start, time_end ",
         "FROM section_schedule INNER JOIN section ON section_id = section.id ",
-        "WHERE day = ? ORDER BY time_start "
+        "WHERE day_of_week = ? ORDER BY time_start "
         ]
     params = [SqlInteger schedule_day]
 

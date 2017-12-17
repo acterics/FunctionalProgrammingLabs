@@ -16,8 +16,9 @@ process _ args = show_error "show" args
 
 
 process_schedule :: [String] -> Connection -> IO Integer
-process_schedule ("week":_) connection = read_all_schedule connection >>= show_schedule >> return continue_code
-process_schedule ("section":section_name:_) connection = read_section_schedule section_name connection >>= show_schedule >> return continue_code
+process_schedule ["week"] connection = read_all_schedule connection >>= show_schedule >> return continue_code
+process_schedule ["section", section_name] connection = read_section_schedule section_name connection >>= show_schedule >> return continue_code
+process_schedule ["day", day] connection  = read_day_schedule (parse_day day) connection >>= show_schedule >> return continue_code
 process_schedule ("help":_) _ = show_schedule_help 
 process_schedule args _ = show_error "show schedule" args
 
@@ -30,14 +31,15 @@ show_help = mapM_ putStrLn help_content >> return continue_code where
     help_content = [
         "persons - Show person table",
         "sections - Show sections table",
-        "schedule - Show schedule"
+        "schedule <args> - Show schedule"
         ]
 
 show_schedule_help :: IO Integer
 show_schedule_help = mapM_ putStrLn help_content >> return continue_code where
     help_content = [
         "week - show week schedule",
-        "section <section_name> - show schedule for section"
+        "section <section_name> - show schedule for section",
+        "day <schedule_day> - show specified day schedule (Mon, Tue, Wed, Thu, Fri, Sat, Sun)"
         ]
 
 show_person :: Person -> IO ()

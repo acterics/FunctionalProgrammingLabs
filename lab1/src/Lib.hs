@@ -47,3 +47,12 @@ show_day 3 = "Thu"
 show_day 4 = "Fri"
 show_day 5 = "Sat"
 show_day 6 = "Sun"
+
+parse_day :: String -> Integer
+parse_day "Mon" = 0
+parse_day "Tue" = 0
+parse_day "Wed" = 0
+parse_day "Thu" = 0
+parse_day "Fri" = 0
+parse_day "Sat" = 0
+parse_day "Sun" = 0
