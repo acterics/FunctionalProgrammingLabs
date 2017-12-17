@@ -6,6 +6,8 @@ import Database.HDBC.PostgreSQL (Connection)
 import Data.List.Split
 import ShowCommand
 import UpdateCommand
+import DeleteCommand
+import CreateCommand
 
 
 -- Entry point for application
@@ -28,8 +30,10 @@ process_command _ "exit" = return exit_success_code
 process_command _ "help" = mapM_ putStrLn help_text >> return continue_code where
         help_text = [
             "help - Show commands description",
-            "show - Show table content",
-            "update - Update table content",
+            "show <args>- Show table content",
+            "update <args> - Update table content",
+            "delete <args> - Delete table content",
+            "create <args> - Create table content",
             "exit - Exit from application"
             ] 
 process_command connection command  = process_command_with_args connection $ parse_command command
@@ -42,6 +46,9 @@ process_command_with_args connection (command:arguments) = process_command_with_
 process_command_with_args' :: String -> Connection -> [String] -> IO Integer
 process_command_with_args' "show" = ShowCommand.process
 process_command_with_args' "update" = UpdateCommand.process
+process_command_with_args' "create" = CreateCommand.process
+process_command_with_args' "delete" = DeleteCommand.process
+
 process_command_with_args' command = \ _ _ -> show_error "" [command]
 
    

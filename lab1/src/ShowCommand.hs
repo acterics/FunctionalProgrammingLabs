@@ -17,7 +17,7 @@ process _ args = show_error "show" args
 
 process_schedule :: [String] -> Connection -> IO Integer
 process_schedule ("week":_) connection = read_all_schedule connection >>= show_schedule >> return continue_code
-process_schedule ("section":(section_name:_)) connection = read_section_schedule section_name connection >>= show_schedule >> return continue_code
+process_schedule ("section":section_name:_) connection = read_section_schedule section_name connection >>= show_schedule >> return continue_code
 process_schedule ("help":_) _ = show_schedule_help 
 process_schedule args _ = show_error "show schedule" args
 
@@ -86,10 +86,6 @@ get_schedule_table_headers :: String
 get_schedule_table_headers = foldl (++) "" fields where
     fields = map get_field_with_spaces ["DAY", "SECTION", "FROM", "TO"]
     
-
-
-
-
     
 get_spaces :: String -> String
 get_spaces input = foldl add "" [0..get_spaces_count input] where
