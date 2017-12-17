@@ -2,73 +2,39 @@ module Lib(
     pollard_rho
 ) where
 
--- func :: Integer -> Integer -> Integer
--- func x n = mod ( x * x - 1) n
-
--- pollardStep :: Integer -> Integer -> Integer -> Integer -> Integer -> Integer
--- pollardStep i k n x y
---         | d /= 1 && d /= n = d
---         | i == k = pollardStep (i+1) (2*k) n x1 x1
---         | otherwise = pollardStep (i+1) k n x1 y where
---              d = gcd n $ abs $ y - x
---              x1 = func x n
-
--- pollard_rho :: Integer -> Integer
--- pollard_rho n = pollardStep 1 2 n 2 2
-
-
 pollard_rho :: Integer -> Integer -> Integer -> IO Integer
-pollard_rho a b p = pollard_step_base a b p 0 0 0 0 1 1 0
+pollard_rho a b p = pollard_step_base [a, b, p, 0, 0, 0, 0, 1, 1, 0]
 
--- new_step_value :: Integer -> Integer -> Integer -> Integer -> Integer -> Integer -> [Integer]
--- new_step_value a b p x ai bi  
---     | (mod x 3) == 0 = [mod (x^2) p, mod (ai * 2) (p - 1), mod (bi * 2) (p - 1)]  
---     | (mod x 3) == 1 = [mod (x * a) p, mod (ai + 1) (p - 1), mod bi (p - 1)]
---     | (mod x 3) == 2 = [mod (x * b) p, mod ai (p - 1), mod(bi + 1) (p - 1)]
-f :: Integer -> Integer -> Integer -> Integer -> Integer
-f a b p x 
-    | (mod x 3) == 0 = mod (x^2) p
-    | (mod x 3) == 1 = mod (x * a) p
-    | (mod x 3) == 2 = mod (x * b) p
-
-g :: Integer -> Integer -> Integer -> Integer
-g p x n
-    | (mod x 3) == 0 = mod (2 * n) (p - 1) 
-    | (mod x 3) == 1 = mod (n + 1) (p - 1)
-    | (mod x 3) == 2 = mod n (p - 1)
-
-h :: Integer -> Integer -> Integer -> Integer
-h p x n
-    | (mod x 3) == 0 = mod (2 * n) (p - 1) 
-    | (mod x 3) == 1 = mod n (p - 1)
-    | (mod x 3) == 2 = mod (n + 1) (p - 1) 
-
--- g :: Integer -> Integer -> Integer -> Integer
--- g p x n
---     | (mod x 3) == 0 = mod (2 * n) p 
---     | (mod x 3) == 1 = mod (n + 1) p
---     | (mod x 3) == 2 = mod n p
-
--- h :: Integer -> Integer -> Integer -> Integer
--- h p x n
---     | (mod x 3) == 0 = mod (2 * n) p 
---     | (mod x 3) == 1 = mod n p
---     | (mod x 3) == 2 = mod (n + 1) p 
-
-pollard_step_base :: Integer -> Integer -> Integer -> Integer -> Integer -> Integer -> Integer -> Integer -> Integer -> Integer -> IO Integer
-pollard_step_base a b p ai a2i bi b2i xi x2i i = do
-    log
-    if xi == x2i && i /= 0 then if bdif /= 0 then return $ mod (quot adif bdif) (p - 1)  else return (-1)
-    else new_step (i + 1) ival i2val where
-        adif = a2i - ai
-        bdif = bi - b2i
-        new_step i' [xi', ai', bi'] [x2i', a2i', b2i'] = pollard_step_base a b p ai' a2i' bi' b2i' xi' x2i' i'
-        ival = [f a b p xi, g p xi ai, h p xi bi]
-        i2val = [f a b p get_x2i, g p get_x2i get_a2i, h p get_x2i get_b2i]
-        get_x2i = f a b p x2i
-        get_a2i = g p x2i a2i
-        get_b2i = h p x2i b2i
-        log = putStrLn $ foldl (++) "" [
+pollard_step_base :: [Integer] -> IO Integer
+pollard_step_base [a, b, p, ai, a2i, bi, b2i, xi, x2i, i] = log_step >>
+    if xi == x2i && i /= 0
+    then if bdif /= 0
+        then if gcd' == 1
+            then log_result >> (return $ mod (quot adif bdif) (p - 1))
+            else log_result >> log_exception >> enum_values 0
+        else error "Factor difference can't be zero"
+    else new_step (i + 1) (new_values a b p [xi, ai, bi]) (new_values a b p $ new_values a b p [x2i, a2i, b2i]) 
+    where
+        adif = abs (ai - a2i)
+        bdif = abs (b2i - bi)
+        new_step i' [xi', ai', bi'] [x2i', a2i', b2i'] = pollard_step_base [a, b, p, ai', a2i', bi', b2i', xi', x2i', i']
+        enum_values m = log_enum m >> if m <= (gcd' - 1)
+                        then if (mod (a ^ (get_enum_x m)) p == b)
+                             then return $ (get_enum_x m)
+                             else enum_values (m + 1)                       
+                        else error "There's no result"
+        gcd' = gcd (p - 1) bdif
+        get_x0 = mod (quot adif bdif) (quot (p - 1) gcd')
+        get_enum_x m = get_x0 + (quot (m * (p - 1)) gcd')
+        -- Functions for logging
+        log_result = putStrLn $ foldl (++) "" [
+            show a, "^", show ai, "*", show b, "^", show bi, 
+            " = ", show xi, " = ",
+            show a, "^", show a2i, "*", show b, "^", show b2i, "\n",
+            "(", show b2i, "-", show bi, ")x0 = (", show ai, "-", show a2i, ")\n", 
+            "x0 = ", show adif, "/", show bdif
+            ]
+        log_step = putStrLn $ foldl (++) "" [
             show a, "^x = ", show b, " % ", show p,
             " step: ", show i,
             " ai:", show ai,
@@ -78,5 +44,17 @@ pollard_step_base a b p ai a2i bi b2i xi x2i i = do
             " b2i:", show b2i,
             " x2i:", show x2i
             ] 
+        log_exception = putStrLn $ foldl (++) "" [
+             "d = GCD(", show bdif, ", ", show (p - 1), ") = ", show gcd', "\n",
+             "x0 = ", show get_x0 
+            ]
+        log_enum m = putStrLn $ foldl (++) "" [
+            "x = ", show get_x0, " + ", show m, " * ", show (p - 1), "/", show gcd', " = ",  show $ get_enum_x m
+            ]
+pollard_step_base x = error $ "Illegal arguments: " ++ show x
 
-    
+new_values :: Integer -> Integer -> Integer -> [Integer] -> [Integer]
+new_values a b p [x', a', b'] 
+    | (mod x' 3) == 0 = [mod (x'^2) p, mod (a' * 2) (p - 1), mod (b' * 2) (p - 1)]  
+    | (mod x' 3) == 1 = [mod (x' * a) p, mod (a' + 1) (p - 1), b']
+    | (mod x' 3) == 2 = [mod (x' * b) p, a', mod(b' + 1) (p - 1)]

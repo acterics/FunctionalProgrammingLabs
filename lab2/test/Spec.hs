@@ -18,7 +18,7 @@ main = hspec $ do
             (simple_method 3 15 17) `shouldBe` 6
         it "pollard method test" $ do
             (pollard_rho 2 5 1019) >>= \result -> result `shouldBe` simple_method 2 5 1019
-            (pollard_rho 2 991 1018) >>= \result -> result `shouldBe` simple_method 2 991 1018
+            (pollard_rho 3 13 17) >>= \result -> result `shouldBe` simple_method 3 13 17
             (pollard_rho 3 15 17) >>= \result -> result `shouldBe` simple_method 3 15 17
             
             
