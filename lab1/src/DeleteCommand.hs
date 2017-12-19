@@ -3,6 +3,8 @@ module DeleteCommand(process) where
 
 import Lib
 import Database.HDBC.PostgreSQL (Connection)
+import Person
+import Section
 
 process :: Connection -> [String] -> IO Integer
 process _ ("help":_) = process_help
@@ -27,13 +29,14 @@ process_help = mapM_ putStrLn help_text >> return continue_code where
         "sections <title> - delete sections with specified title"
         ]
 
+
 process_persons :: Connection -> [String] -> IO Integer
-process_persons connection [first_name, last_name] = return continue_code
-process_persons connection [person_position] = return continue_code
+process_persons connection [first_name, last_name] = delete_persons_by_name first_name last_name connection >>= check_result
+process_persons connection [person_position] = delete_persons_by_position position connection >>= check_result
 process_persons _ args = show_error "delete persons" args
 
 process_person :: Connection -> [String] -> IO Integer
-process_person connection [ person_id] = return continue_code
+process_person connection [person_id] = delete_person person_id connection >>= check_result
 process_person _ args = show_error "delete person" args
 
 process_section :: Connection -> [String] -> IO Integer

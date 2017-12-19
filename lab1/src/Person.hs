@@ -47,7 +47,6 @@ read_section_persons section_id connection = quickQuery connection query params 
   params = [SqlInteger section_id]
 
 
-
 update_person :: Id -> FirstName -> LastName -> Position -> Connection -> IO Bool
 update_person person_id first_name last_name pos connection = 
   run connection query params >>= is_success_db_operation where
@@ -59,6 +58,20 @@ delete_person person_id connection =
   run connection query params >>= is_success_db_operation where
     query = "DELETE FROM person WHERE id = ?"
     params = [SqlInteger person_id]
+
+
+delete_persons_by_name :: FirstName -> LastName -> Connection -> IO Bool
+delete_persons_by_name first_name last_name connection = 
+  run connection query params >>= is_success_db_operation where
+    query = "DELETE FROM person WHERE first_name = ? AND last_name = ?"
+    params = map (SqlByteString . BS.pack) [first_name, last_name]
+
+delete_persons_by_position :: Position -> Connection -> IO Bool
+delete_persons_by_position position connection = 
+  run connection query params >>= is_success_db_operation where
+    query = "DELETE FROM person WHERE position = ?"
+    params = map (SqlByteString . BS.pack) [position]
+
 
 create_person :: FirstName -> LastName -> Position -> Connection -> IO Bool
 create_person first_name last_name pos connection =
