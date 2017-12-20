@@ -3,5 +3,25 @@
         "defclass",
         "defun",
         "setq"
+    ],
+    "cSpell.enabledLanguageIds": [
+        "c",
+        "cpp",
+        "csharp",
+        "go",
+        "handlebars",
+        "haskell",
+        "javascript",
+        "javascriptreact",
+        "json",
+        "latex",
+        "lisp",
+        "php",
+        "python",
+        "restructuredtext",
+        "text",
+        "typescript",
+        "typescriptreact",
+        "yml"
     ]
 }
