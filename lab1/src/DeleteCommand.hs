@@ -52,7 +52,8 @@ process_sections _ args = show_error "delete sections" args
 
 process_schedule :: Connection -> [String] -> IO Integer
 process_schedule connection ["day", day] = delete_day_schedule day connection >>= check_result
-process_schedule connection ["section", section_title] = delete_section_schedule section_title connection >>= check_result
+process_schedule connection ["section", section_title] = 
+    delete_section_schedule section_title connection >>= check_result
 process_schedule connection ["day", day, "section", section_title] = 
     delete_section_day_schedule section_title (parse_day day) connection >>= check_result
 process_schedule _ ["help"] = mapM_ putStrLn help_text >> return continue_code where
