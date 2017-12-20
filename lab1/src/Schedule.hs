@@ -72,15 +72,39 @@ update_section_day_schedule section_id schedule_day begin end connection =
         params = [SqlLocalTimeOfDay $ parse_time begin, SqlLocalTimeOfDay $ parse_time end, SqlInteger section_id, SqlInteger schedule_day]
 
 delete_schedule :: Id -> Connection -> IO Bool 
-delete_schedule schedule_id connection = run connection query params >>= is_success_db_operation where
-    query = "DELETE FROM section_schedule WHERE id = ?"
-    params = [SqlInteger schedule_id]
-
-delete_section_day_schedule :: Id -> ScheduleDay -> Connection -> IO Bool
-delete_section_day_schedule section_id schedule_day connection =
+delete_schedule schedule_id connection = 
     run connection query params >>= is_success_db_operation where
-        query = "DELETE FROM section_schedule WHERE section_id = ? AND day_of_week = ?"
-        params = [SqlInteger section_id, SqlInteger schedule_day]
+        query = "DELETE FROM section_schedule WHERE id = ?"
+        params = [SqlInteger schedule_id]
+
+delete_section_day_schedule :: String -> ScheduleDay -> Connection -> IO Bool
+delete_section_day_schedule section_title schedule_day connection =
+    run connection query params >>= is_success_db_operation where
+        query = foldl (++) "" [
+            "DELETE section_schedule ", 
+            "FROM section_schedule INNER JOIN section ON section_id = section.id ", 
+            "WHERE title = ? AND day_of_week = ?"
+            ]
+        params = map (SqlByteString . BS.pack) [section_title] ++ [SqlInteger schedule_day]
+
+delete_section_schedule :: String -> Connection -> IO Bool
+delete_section_schedule section_title connection = 
+    run connection query params >>= is_success_db_operation where
+        query = foldl (++) "" [
+            "DELETE section_schedule ",
+            "FROM section_schedule INNER JOIN section ON section_id = section.id", 
+            "WHERE title = ?"
+            ]
+        params = map (SqlByteString . BS.pack) [section_title]
+
+
+
+delete_day_schedule :: String -> Connection -> IO Bool
+delete_day_schedule day connection = 
+    run connection query params >>= is_success_db_operation where
+        query = "DELETE FROM section_schedule WHERE day_of_week = ?"
+        params = map (SqlInteger . parse_day) [day]
+
 
 create_schedule :: Id -> ScheduleDay -> RawTime -> RawTime -> Connection -> IO Bool
 create_schedule section_id schedule_day begin end connection =

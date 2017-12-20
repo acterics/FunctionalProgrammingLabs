@@ -53,6 +53,12 @@ delete_section section_id connection =
     query = "DELETE FROM section WHERE id = ?"
     params = [SqlInteger section_id]
 
+delete_sections_by_title :: String -> Connection -> IO Bool
+delete_sections_by_title title connection = 
+  run connection query params >>= is_success_db_operation where
+    query = "DELETE FROM section WHERE title = ?"
+    params = map (SqlByteString . BS.pack) [title]
+
 
 create_section :: SectionTitle -> Connection -> IO Bool
 create_section section_title connection = 

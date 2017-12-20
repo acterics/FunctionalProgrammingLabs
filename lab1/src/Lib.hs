@@ -32,12 +32,13 @@ show_error command args = mapM_ putStrLn error_info >> return continue_code wher
         ]
     
 
+-- Get database connection with specified in .env file database credentials
+get_db_connection :: IO Connection
+get_db_connection = readFile ".env" >>= connectPostgreSQL . get_env_connection_args
+
 -- Util func for time
 parse_time :: String -> TimeOfDay
 parse_time dateStr = parseTimeOrError True defaultTimeLocale "%H:%M:%S" dateStr :: TimeOfDay
-
-get_db_connection :: IO Connection
-get_db_connection = readFile ".env" >>= connectPostgreSQL . get_env_connection_args
 
 show_day :: Integer -> String
 show_day 0 = "Mon"
@@ -47,12 +48,14 @@ show_day 3 = "Thu"
 show_day 4 = "Fri"
 show_day 5 = "Sat"
 show_day 6 = "Sun"
+show_day day_code = error $ "Illegal day code: " ++ show day_code
 
 parse_day :: String -> Integer
 parse_day "Mon" = 0
-parse_day "Tue" = 0
-parse_day "Wed" = 0
-parse_day "Thu" = 0
-parse_day "Fri" = 0
-parse_day "Sat" = 0
-parse_day "Sun" = 0
+parse_day "Tue" = 1
+parse_day "Wed" = 2
+parse_day "Thu" = 3
+parse_day "Fri" = 4
+parse_day "Sat" = 5
+parse_day "Sun" = 6
+parse_day day = error $ "Illegal day: " ++ day
