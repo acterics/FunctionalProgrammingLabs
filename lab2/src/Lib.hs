@@ -2,6 +2,7 @@ module Lib(
     pollard_rho
 ) where
 
+--Solve a^x = b (mod p) task
 pollard_rho :: Integer -> Integer -> Integer -> IO Integer
 pollard_rho a b p = pollard_step_base [a, b, p, 0, 0, 0, 0, 1, 1, 0]
 
